@@ -28,8 +28,13 @@
 
 	 helloworld = { "hello world"; };
 	 
-	 _result = ["check", [helloworld, "hello world", ""]] call _unittest;
-	 _result = ["checkObject", [_unittest,"helloworld", "hello world", ""]] call _unittest;
+	 _result = ["call", [helloworld, "hello world", ""]] call _unittest;
+	_result = ["call", [helloworld, "hello robert", ""]] call _unittest;
+	_result = ["call", [helloworld, "hello jojo la frite", ""]] call _unittest;
+	_result = ["call", [helloworld, "hello renaud et sa grosse bécane", ""]] call _unittest;
 
-	 hint format ["%1", _result];
+	//_result = ["checkObject", [_unittest,"helloworld", "hello world", ""]] call _unittest;
+	 
+	 "dump" call _unittest;
+
 

@@ -21,12 +21,40 @@
 	#include "oop.h"
 
 	CLASS("OO_UNITTEST")
+		PRIVATE VARIABLE("array", "log");
+		
 		PUBLIC FUNCTION("","constructor") { 
 			DEBUG(#, "OO_UNITTEST::constructor")
+			MEMBER("log", []);
 		};
 
 		PUBLIC FUNCTION("", "helloworld") {
 			"hello world";
+		};
+
+		PUBLIC FUNCTION("","dump") {
+			DEBUG(#, "OO_UNITTEST::dump")
+			private _log = "";
+			{
+				_log = _log + _x + endl;
+			} forEach MEMBER("log", nil);
+			copyToClipboard _log;
+			hint "Results were copied to your clipboard";
+		};
+
+		PUBLIC FUNCTION("array", "call") {
+			DEBUG(#, "OO_UNITTEST::call")
+			_result = MEMBER("check", _this);
+			if(_result) then {_result = "SUCCESS";} else {"FAILED";};
+			private _parameters = _this select 2;
+			if(isNil _parameters) then  { _parameters = "none"};
+			private _log = "==> ";
+			_log = _log + format ["Function: %1", _this select 0] + endl;
+			_log = _log + format ["Params: %1", _parameters] + endl; 
+			_log = _log + format ["Result expected: %1", _this select 1] + endl; 
+			_log = _log + format ["Pass Through: %1" , _result] + endl;
+			_log = _log + "==============================" + endl;
+			MEMBER("log", nil) pushBack _log;
 		};
 
 		/*
@@ -50,7 +78,7 @@
 		4 - parameters
 		*/
 		PUBLIC FUNCTION("array", "checkObject") {
-			DEBUG(#, "OO_UNITTEST::check")
+			DEBUG(#, "OO_UNITTEST::checkObject")
 			params ["_object", "_function", "_return","_parameters"];
 			private _result = _return;
 			if!(typeName _object isEqualTo "CODE") exitWith {false;};
@@ -62,5 +90,10 @@
 				_result = [_function, _parameters] call _object;
 			};
 			if(_result isEqualTo _return) then {true;} else {false;};
-		};		
+		};
+
+		PUBLIC FUNCTION("","deconstructor") {
+			DEBUG(#, "OO_UNITTEST::deconstructor")
+			DELETE_VARIABLE("log");
+		};
 	ENDCLASS;
