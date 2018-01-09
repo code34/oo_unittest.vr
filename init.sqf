@@ -22,21 +22,31 @@
 
 	call compile preprocessFileLineNumbers "oo_unittest.sqf";
 
-	sleep 4;
+	sleep 2;
 
 	 _unittest = "new" call OO_UNITTEST;
 
 	 helloworld = { "hello world"; };
+
+	cheatfunction = { 
+	 	for "_i" from 0 to 9999 step 1 do {
+	 		hint "blabla";
+	 	};
+	 	"hello world";
+	};
 	 
-	_result = ["call", [helloworld, "ho world", ""]] call _unittest;
-	_result = ["call", [toto, "hello world", ""]] call _unittest;
-	_result = ["call", ["helpjdfq", "hello world", ""]] call _unittest;
-	_result = ["call", ["helloworld", "hello world", ""]] call _unittest;
-	_result = ["call", ["helloworld", "hello robert", ""]] call _unittest;
-	_result = ["call", ["helloworld", "hello jojo la frite", ""]] call _unittest;
-	_result = ["call", ["helloworld", "hello renaud et sa grosse bécane", ""]] call _unittest;
+	_result = ["assert_equal", [helloworld, "ho world", ""]] call _unittest;
+	_result = ["assert_equal", [toto, "hello world", ""]] call _unittest;
+	_result = ["assert_equal", ["helpjdfq", "hello world", ""]] call _unittest;
+	_result = ["assert_equal", ["helloworld", "hello world", ""]] call _unittest;
+	_result = ["assert_equal", ["cheatfunction", "hello world", ""]] call _unittest;
+	_result = ["assert_equal", ["helloworld", "hello robert", ""]] call _unittest;
+	_result = ["assert_not_equal", ["helloworld", "hello jojo la frite", ""]] call _unittest;
+	_result = ["assert_equal", ["helloworld", "hello renaud et sa grosse bécane", ""]] call _unittest;
 
 	//_result = ["checkObject", [_unittest,"helloworld", "hello world", ""]] call _unittest;
+	// assert_contain
+
 	 
 	 "dump" call _unittest;
 
