@@ -28,10 +28,13 @@
 
 	 helloworld = { "hello world"; };
 	 
-	 _result = ["call", [helloworld, "hello world", ""]] call _unittest;
-	_result = ["call", [helloworld, "hello robert", ""]] call _unittest;
-	_result = ["call", [helloworld, "hello jojo la frite", ""]] call _unittest;
-	_result = ["call", [helloworld, "hello renaud et sa grosse bécane", ""]] call _unittest;
+	_result = ["call", [helloworld, "ho world", ""]] call _unittest;
+	_result = ["call", [toto, "hello world", ""]] call _unittest;
+	_result = ["call", ["helpjdfq", "hello world", ""]] call _unittest;
+	_result = ["call", ["helloworld", "hello world", ""]] call _unittest;
+	_result = ["call", ["helloworld", "hello robert", ""]] call _unittest;
+	_result = ["call", ["helloworld", "hello jojo la frite", ""]] call _unittest;
+	_result = ["call", ["helloworld", "hello renaud et sa grosse bécane", ""]] call _unittest;
 
 	//_result = ["checkObject", [_unittest,"helloworld", "hello world", ""]] call _unittest;
 	 

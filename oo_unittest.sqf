@@ -44,16 +44,43 @@
 
 		PUBLIC FUNCTION("array", "call") {
 			DEBUG(#, "OO_UNITTEST::call")
-			_result = MEMBER("check", _this);
-			if(_result) then {_result = "SUCCESS";} else {"FAILED";};
-			private _parameters = _this select 2;
-			if(isNil _parameters) then  { _parameters = "none"};
+			params ["_function", "_return","_parameters"];
+			if(isNil "_parameters") then  { _parameters = ""};
+			private _reason = "none";
+			private _result = "";
+
+			try { 
+				MEMBER("check", _this);
+				_result = "SUCCESS";
+			} catch {
+				switch (_exception) do { 
+					case "FUNCTIONNOTSTRING" : {
+						_reason = "Exception: function name is not string";
+						_function = "None";
+					}; 
+					case "FUNCTIONNOTDECLARED" : {
+						_reason = "Exception: function is not declared";
+					}; 
+					case "FUNCTIONRESULTISNIL" : {
+						_reason = "Exception: function result is nil";
+					};
+					case "RESULTNOTEXPECTED" : {
+						_reason = "Exception: result is not EqualTo result expected";
+					};
+					default {
+						_reason = "Exception: not handle";
+					}; 
+				};
+				_result = "FAILED";
+			};
+			
 			private _log = "==> ";
-			_log = _log + format ["Function: %1", _this select 0] + endl;
+			_log = _log + format ["Function: %1", _function] + endl;
 			_log = _log + format ["Params: %1", _parameters] + endl; 
-			_log = _log + format ["Result expected: %1", _this select 1] + endl; 
+			_log = _log + format ["Result expected: %1", _return] + endl; 
 			_log = _log + format ["Pass Through: %1" , _result] + endl;
-			_log = _log + "==============================" + endl;
+			_log = _log + format ["Error Message: %1" , _reason] + endl;
+			_log = _log + "<==" + endl;
 			MEMBER("log", nil) pushBack _log;
 		};
 
@@ -65,10 +92,13 @@
 		PUBLIC FUNCTION("array", "check") {
 			DEBUG(#, "OO_UNITTEST::check")
 			params ["_function", "_return","_parameters"];
-			if(typeName _function isEqualTo "STRING") then { _function = missionNamespace getVariable "_function"; };
-			if!(typeName _function isEqualTo "CODE") exitWith {false;};
+			if(isnil "_function") then { throw "FUNCTIONNOTSTRING"; };
+			if!(typeName _function isEqualTo "STRING") then { throw "FUNCTIONNOTSTRING"; };
+			_function = missionNamespace getVariable _function; 
+			if(isNil "_function") then { throw "FUNCTIONNOTDECLARED";};
 			private _result = _parameters call _function;
-			if!(_result isEqualTo _return) then {false;} else {true;};
+			if(isNil "_result") then { throw "FUNCTIONRESULTISNIL"; };
+			if!(_result isEqualTo _return) then { throw "RESULTNOTEXPECTED"; };
 		};
 
 		/*
