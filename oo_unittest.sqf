@@ -58,15 +58,23 @@
 
 		PUBLIC FUNCTION("array","assert_equal") {
 			_this pushBack "assert_equal";
-			MEMBER("executeAssert", _this);
+			if(count _this > 4) then {
+				MEMBER("executeAssertOnObject", _this);
+			} else {
+				MEMBER("executeAssert", _this);
+			};
 		};
 
 		PUBLIC FUNCTION("array","assert_not_equal") {
 			_this pushBack "assert_not_equal";
-			MEMBER("executeAssert", _this);
+			if(count _this > 4) then {
+				MEMBER("executeAssertOnObject", _this);
+			} else {
+				MEMBER("executeAssert", _this);
+			};
 		};
 
-		PUBLIC FUNCTION("array", "executeAssert") {
+		PRIVATE FUNCTION("array", "executeAssert") {
 			DEBUG(#, "OO_UNITTEST::call")
 			params ["_function", "_returnexpected","_parameters", "_condition"];
 			
@@ -159,6 +167,109 @@
 			_log = _log + "<==" + endl;
 			MEMBER("log", nil) pushBack _log;
 		};
+
+
+		PRIVATE FUNCTION("array", "executeAssertOnObject") {
+			DEBUG(#, "OO_UNITTEST::call")
+			params ["_object", "_function", "_returnexpected","_parameters", "_condition"];
+			
+			private _return = "";
+			private _reason = "";
+			private 	_result = "SUCCESSED";
+			private _code = "";
+			private _stats = MEMBER("stats", nil);
+			private _ticktime = 0;
+			//if!(toLower(_condition) in ["assert_equal", "assert_not_equal", "assert_instance_of", "assert_kind_of", "assert_respond_to"]) then {_condition = "assert_equal";};
+			if!(toLower(_condition) in ["assert_equal", "assert_not_equal"]) then {_condition = "assert_equal";};
+			try { 
+				if(isnil "_object") then { throw "OBJECTISNOTDEFINED"; };
+				if!(typeName _object isEqualTo "CODE") then { throw "OBJECTISNOTDEFINED"; };
+				if(isnil "_function") then { throw "FUNCTIONNOTSTRING"; };
+				if!(typeName _function isEqualTo "STRING") then { throw "FUNCTIONNOTSTRING"; };
+				if(isnil "_returnexpected") then { throw "RESULTNOTDEFINED"; };
+				
+				isnil { 
+					if!(isNil "_parameters") then  {
+						_ticktime = diag_tickTime;
+						_return = [_function, _parameters] call _object;
+						_ticktime = diag_tickTime - _ticktime;
+					} else {
+						_ticktime = diag_tickTime;
+						_return = _function call _object;
+						_ticktime = diag_tickTime - _ticktime;
+					};
+				};
+
+				if(isNil "_return") then { throw "FUNCTIONRESULTISNIL"; };
+				switch (_condition) do {
+					case "assert_equal": {
+						if!(_return isEqualTo _returnexpected) then { throw "RESULTNOTEXPECTED"; };
+					};
+					case "assert_not_equal": {
+						if(_return isEqualTo _returnexpected) then { throw "RESULTNOTEXPECTED"; };
+					};
+				};
+				
+				_stats = [(_stats select 0) + 1, (_stats select 1) , (_stats select 2)];
+				MEMBER("stats", _stats);
+			} catch {
+				switch (_exception) do { 
+					case "OBJECTISNOTDEFINED" : {
+						_reason = "Exception: object was not define";
+						_object = format ["%1", _object];
+						_function = format ["%1", _function];
+						_result = "PASSED";
+						_stats = [(_stats select 0), (_stats select 1) + 1 , (_stats select 2)];
+						MEMBER("stats", _stats);
+						_return = nil;
+					};
+					case "RESULTNOTDEFINED" : {
+						_reason = "Exception: result expected was not define";
+						_function = format ["%1", _function];
+						_result = "PASSED";
+						_stats = [(_stats select 0), (_stats select 1) + 1 , (_stats select 2)];
+						MEMBER("stats", _stats);
+						_return = nil;
+					};
+					case "FUNCTIONNOTSTRING" : {
+						_reason = "Exception: function name is not string";
+						_function = format ["%1", _function];
+						_result = "PASSED";
+						_stats = [(_stats select 0), (_stats select 1) + 1 , (_stats select 2)];
+						MEMBER("stats", _stats);
+						_return = nil;
+					}; 
+					case "FUNCTIONRESULTISNIL" : {
+						_reason = "Exception: function result is nil";
+						_result = "FAILED";
+						_stats = [(_stats select 0), (_stats select 1), (_stats select 2)+1];
+						MEMBER("stats", _stats);
+					};
+					case "RESULTNOTEXPECTED" : {
+						_reason = "Exception: result is not the one expected";
+						_result = "FAILED";
+						_stats = [(_stats select 0), (_stats select 1), (_stats select 2)+1];
+						MEMBER("stats", _stats);
+					};
+					default {
+						_reason = "Exception: not handle";
+					}; 
+				};
+			};
+			
+			private _log = "==> ";
+			_log = _log + format ["Function: %1", _function] + endl;
+			_log = _log + format ["Params: %1", _parameters] + endl; 
+			_log = _log + format ["Condition: %1", _condition] + endl; 
+			_log = _log + format ["Return expected: %1 (%2)", typename _returnexpected, _returnexpected] + endl; 
+			_log = _log + format ["Return: %1 (%2)", typename _return, _return] + endl; 
+			_log = _log + format ["Time: %1 ms" , _ticktime] + endl;
+			_log = _log + format ["Result: %1" , _result] + endl;
+			_log = _log + format ["Error Message: %1" , _reason] + endl;
+			_log = _log + "<==" + endl;
+			MEMBER("log", nil) pushBack _log;
+		};
+
 
 		/*
 		1 - function name
