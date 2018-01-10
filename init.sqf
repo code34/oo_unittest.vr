@@ -21,10 +21,12 @@
 	#include "oop.h"
 
 	call compile preprocessFileLineNumbers "oo_unittest.sqf";
+	call compile preprocessFileLineNumbers "oo_helloworld.sqf";
 
 	sleep 2;
 
 	 _unittest = "new" call OO_UNITTEST;
+	 _hellworld = "new" call OO_HELLOWORLD;
 
 	 helloworld = { "hello world"; };
 
@@ -43,11 +45,8 @@
 	_result = ["assert_equal", ["helloworld", "hello robert", ""]] call _unittest;
 	_result = ["assert_not_equal", ["helloworld", "hello jojo la frite", ""]] call _unittest;
 	_result = ["assert_equal", ["helloworld", "hello renaud et sa grosse bécane", ""]] call _unittest;
+	_result = ["assert_equal", [_helloworld, "helloworld", "i got it", ""]] call _unittest;
 
-	//_result = ["checkObject", [_unittest,"helloworld", "hello world", ""]] call _unittest;
-	// assert_contain
-
-	 
 	 "dump" call _unittest;
 
 
