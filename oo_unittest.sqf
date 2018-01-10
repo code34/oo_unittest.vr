@@ -29,15 +29,26 @@
 			MEMBER("init", nil);
 		};
 
-		PUBLIC FUNCTION("", "helloworld") {
-			"hello world";
-		};
-
 		PUBLIC FUNCTION("","init") {
 			DEBUG(#, "OO_UNITTEST::init")
 			MEMBER("log", []);
 			private _array = [0,0,0];
 			MEMBER("stats", _array);
+		};
+
+		PRIVATE FUNCTION("array", "pushLog") {
+			params ["_function", "_parameters", "_condition", "_returnexpected", "_return", "_ticktime", "_result", "_reason"];
+			private _log = "==> ";
+			_log = _log + format ["Function: %1", _function] + endl;
+			_log = _log + format ["Params: %1", _parameters] + endl; 
+			_log = _log + format ["Condition: %1", _condition] + endl; 
+			_log = _log + format ["Return expected: %1 (%2)", typename _returnexpected, _returnexpected] + endl; 
+			_log = _log + format ["Return: %1 (%2)", typename _return, _return] + endl; 
+			_log = _log + format ["Time: %1 ms" , _ticktime] + endl;
+			_log = _log + format ["Result: %1" , _result] + endl;
+			_log = _log + format ["Error Message: %1" , _reason] + endl;
+			_log = _log + "<==" + endl;
+			MEMBER("log", nil) pushBack _log;
 		};
 
 		PUBLIC FUNCTION("","dump") {
@@ -54,6 +65,7 @@
 			_log = _log + format ["Failed: %1", _stats select 2] + endl;
 			copyToClipboard _log;
 			hint "Results were copied to your clipboard";
+			MEMBER("init", nil);
 		};
 
 		PUBLIC FUNCTION("array","assert_equal") {
@@ -154,18 +166,8 @@
 					}; 
 				};
 			};
-			
-			private _log = "==> ";
-			_log = _log + format ["Function: %1", _function] + endl;
-			_log = _log + format ["Params: %1", _parameters] + endl; 
-			_log = _log + format ["Condition: %1", _condition] + endl; 
-			_log = _log + format ["Return expected: %1 (%2)", typename _returnexpected, _returnexpected] + endl; 
-			_log = _log + format ["Return: %1 (%2)", typename _return, _return] + endl; 
-			_log = _log + format ["Time: %1 ms" , _ticktime] + endl;
-			_log = _log + format ["Result: %1" , _result] + endl;
-			_log = _log + format ["Error Message: %1" , _reason] + endl;
-			_log = _log + "<==" + endl;
-			MEMBER("log", nil) pushBack _log;
+			_array = [_function, _parameters, _condition, _returnexpected, _return, _ticktime, _result, _reason];
+			MEMBER("pushLog", _array);
 		};
 
 
@@ -209,7 +211,6 @@
 						if(_return isEqualTo _returnexpected) then { throw "RESULTNOTEXPECTED"; };
 					};
 				};
-				
 				_stats = [(_stats select 0) + 1, (_stats select 1) , (_stats select 2)];
 				MEMBER("stats", _stats);
 			} catch {
@@ -256,57 +257,8 @@
 					}; 
 				};
 			};
-			
-			private _log = "==> ";
-			_log = _log + format ["Function: %1", _function] + endl;
-			_log = _log + format ["Params: %1", _parameters] + endl; 
-			_log = _log + format ["Condition: %1", _condition] + endl; 
-			_log = _log + format ["Return expected: %1 (%2)", typename _returnexpected, _returnexpected] + endl; 
-			_log = _log + format ["Return: %1 (%2)", typename _return, _return] + endl; 
-			_log = _log + format ["Time: %1 ms" , _ticktime] + endl;
-			_log = _log + format ["Result: %1" , _result] + endl;
-			_log = _log + format ["Error Message: %1" , _reason] + endl;
-			_log = _log + "<==" + endl;
-			MEMBER("log", nil) pushBack _log;
-		};
-
-
-		/*
-		1 - function name
-		2 - return expected
-		3 - parameters
-		*/
-		PUBLIC FUNCTION("array", "check") {
-			DEBUG(#, "OO_UNITTEST::check")
-			params ["_function", "_return","_parameters"];
-			if(isnil "_function") then { throw "FUNCTIONNOTSTRING"; };
-			if!(typeName _function isEqualTo "STRING") then { throw "FUNCTIONNOTSTRING"; };
-			_function = missionNamespace getVariable _function; 
-			if(isNil "_function") then { throw "FUNCTIONNOTDECLARED";};
-			private _result = _parameters call _function;
-			if(isNil "_result") then { throw "FUNCTIONRESULTISNIL"; };
-			if!(_result isEqualTo _return) then { throw "RESULTNOTEXPECTED"; };
-		};
-
-		/*
-		1 - object
-		2 - function name
-		3 - return expected
-		4 - parameters
-		*/
-		PUBLIC FUNCTION("array", "checkObject") {
-			DEBUG(#, "OO_UNITTEST::checkObject")
-			params ["_object", "_function", "_return","_parameters"];
-			private _result = _return;
-			if!(typeName _object isEqualTo "CODE") exitWith {false;};
-			if!(typeName _function isEqualTo "STRING") exitWith {false;};
-			if(isNil "_parameters") then { _parameters = "";};
-			if(_parameters isEqualTo "") then {
-				_result = _function call _object;
-			} else {
-				_result = [_function, _parameters] call _object;
-			};
-			if(_result isEqualTo _return) then {true;} else {false;};
+			_array = [_function, _parameters, _condition, _returnexpected, _return, _ticktime, _result, _reason];
+			MEMBER("pushLog", _array);
 		};
 
 		PUBLIC FUNCTION("","deconstructor") {
