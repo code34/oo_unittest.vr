@@ -1,0 +1,5 @@
+Unittest:
+  ☐ Factoriser les fonctions assert
+  ☐ Factoriser les gestions d'exceptions
+  ☐ Voir s'il est possible / utile d'ajouter des conditions supplémentaires : "assert_instance_of", "assert_kind_of", "assert_respond_to"
+  
