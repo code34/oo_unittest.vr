@@ -37,13 +37,14 @@
 		};
 
 		PRIVATE FUNCTION("array", "pushLog") {
-			params ["_function", "_parameters", "_condition", "_returnexpected", "_return", "_ticktime", "_result", "_reason"];
+			DEBUG(#, "OO_UNITTEST::pushLog")
+			params ["_function", "_parameters", "_condition", "_returnexpectedtype", "_returnexpected", "_returntype", "_return", "_ticktime", "_result", "_reason"];
 			private _log = "==> ";
 			_log = _log + format ["Function: %1", _function] + endl;
-			_log = _log + format ["Params: %1", _parameters] + endl; 
 			_log = _log + format ["Condition: %1", _condition] + endl; 
-			_log = _log + format ["Return expected: %1 (%2)", typename _returnexpected, _returnexpected] + endl; 
-			_log = _log + format ["Return: %1 (%2)", typename _return, _return] + endl; 
+			_log = _log + format ["Params: %1", _parameters] + endl; 
+			_log = _log + format ["Return expected: %1 (%2)", _returnexpectedtype, _returnexpected] + endl; 
+			_log = _log + format ["Return: %1 (%2)", _returntype, _return] + endl; 
 			_log = _log + format ["Time: %1 ms" , _ticktime] + endl;
 			_log = _log + format ["Result: %1" , _result] + endl;
 			_log = _log + format ["Error Message: %1" , _reason] + endl;
@@ -69,135 +70,85 @@
 		};
 
 		PUBLIC FUNCTION("array","assert_equal") {
+			DEBUG(#, "OO_UNITTEST::assert_equal")
+			if(count _this < 4) exitWith { hint "OO_UNITTEST: missing parameters";};
 			_this pushBack "assert_equal";
-			if(count _this > 4) then {
-				MEMBER("executeAssertOnObject", _this);
-			} else {
-				MEMBER("executeAssert", _this);
-			};
+			MEMBER("executeAssertOnObject", _this);
 		};
 
 		PUBLIC FUNCTION("array","assert_not_equal") {
+			DEBUG(#, "OO_UNITTEST::assert_not_equal")
+			if(count _this < 4) exitWith { hint "OO_UNITTEST: missing parameters";};
 			_this pushBack "assert_not_equal";
-			if(count _this > 4) then {
-				MEMBER("executeAssertOnObject", _this);
-			} else {
-				MEMBER("executeAssert", _this);
-			};
+			MEMBER("executeAssertOnObject", _this);
 		};
 
-		PRIVATE FUNCTION("array", "executeAssert") {
-			DEBUG(#, "OO_UNITTEST::call")
-			params ["_function", "_returnexpected","_parameters", "_condition"];
-			
-			private _return = "";
-			private _reason = "";
-			private 	_result = "SUCCESSED";
-			private _code = "";
-			private _stats = MEMBER("stats", nil);
+		PRIVATE FUNCTION("array", "executeCode") {
+			private _object = _this select 0;
+			private _function = _this select 1;
+			private _parameters = _this select 2;
 			private _ticktime = 0;
-			//if!(toLower(_condition) in ["assert_equal", "assert_not_equal", "assert_instance_of", "assert_kind_of", "assert_respond_to"]) then {_condition = "assert_equal";};
-			if!(toLower(_condition) in ["assert_equal", "assert_not_equal"]) then {_condition = "assert_equal";};
-			try { 
-				if(isnil "_function") then { throw "FUNCTIONNOTSTRING"; };
-				if!(typeName _function isEqualTo "STRING") then { throw "FUNCTIONNOTSTRING"; };
-				if(isnil "_returnexpected") then { throw "RESULTNOTDEFINED"; };
-				
-				_code = missionNamespace getVariable _function;
-				if(isNil "_code") then { throw "FUNCTIONNOTDECLARED";};
-
-				isnil { 
+			private _return = "";
+			isnil { 
+				if(isnil "_parameters") then {
 					_ticktime = diag_tickTime;
-					_return = _parameters call _code;
+					_return = _function call _object;
+					_ticktime = diag_tickTime - _ticktime;
+				} else {
+					_ticktime = diag_tickTime;
+					_return = [_function, _parameters] call _object;
 					_ticktime = diag_tickTime - _ticktime;
 				};
-
-				if(isNil "_return") then { throw "FUNCTIONRESULTISNIL"; };
-				switch (_condition) do {
-					case "assert_equal": {
-						if!(_return isEqualTo _returnexpected) then { throw "RESULTNOTEXPECTED"; };
-					};
-					case "assert_not_equal": {
-						if(_return isEqualTo _returnexpected) then { throw "RESULTNOTEXPECTED"; };
-					};
-				};
-				
-				_stats = [(_stats select 0) + 1, (_stats select 1) , (_stats select 2)];
-				MEMBER("stats", _stats);
-			} catch {
-				switch (_exception) do { 
-					case "RESULTNOTDEFINED" : {
-						_reason = "Exception: result expected was not define";
-						_function = format ["%1", _function];
-						_result = "PASSED";
-						_stats = [(_stats select 0), (_stats select 1) + 1 , (_stats select 2)];
-						MEMBER("stats", _stats);
-						_return = nil;
-					};
-					case "FUNCTIONNOTSTRING" : {
-						_reason = "Exception: function name is not string";
-						_function = format ["%1", _function];
-						_result = "PASSED";
-						_stats = [(_stats select 0), (_stats select 1) + 1 , (_stats select 2)];
-						MEMBER("stats", _stats);
-						_return = nil;
-					}; 
-					case "FUNCTIONNOTDECLARED" : {
-						_reason = "Exception: function is not declared";
-						_result = "PASSED";
-						_stats = [(_stats select 0), (_stats select 1) + 1 , (_stats select 2)];
-						MEMBER("stats", _stats);
-						_return = nil;
-					}; 
-					case "FUNCTIONRESULTISNIL" : {
-						_reason = "Exception: function result is nil";
-						_result = "FAILED";
-						_stats = [(_stats select 0), (_stats select 1), (_stats select 2)+1];
-						MEMBER("stats", _stats);
-					};
-					case "RESULTNOTEXPECTED" : {
-						_reason = "Exception: result is not the one expected";
-						_result = "FAILED";
-						_stats = [(_stats select 0), (_stats select 1), (_stats select 2)+1];
-						MEMBER("stats", _stats);
-					};
-					default {
-						_reason = "Exception: not handle";
-					}; 
-				};
 			};
-			_array = [_function, _parameters, _condition, _returnexpected, _return, _ticktime, _result, _reason];
-			MEMBER("pushLog", _array);
+			if(isNil "_return") then { throw "FUNCTIONRESULTISNIL"; };
+			[_ticktime, _return];
 		};
 
+		PRIVATE FUNCTION("array", "compareResult") {
+			_condition = _this select 0;
+			_return = _this select 1;
+			_returnexpected = _this select 2;
+			switch (_condition) do {
+				case "assert_equal": {
+					if!(_return isEqualTo _returnexpected) then { throw "RESULTNOTEXPECTED"; };
+				};
+				case "assert_not_equal": {
+					if(_return isEqualTo _returnexpected) then { throw "RESULTNOTEXPECTED"; };
+				};
+			};
+			_stats = [(_stats select 0) + 1, (_stats select 1) , (_stats select 2)];
+			MEMBER("stats", _stats);
+		};
 
 		PRIVATE FUNCTION("array", "executeAssertOnObject") {
-			DEBUG(#, "OO_UNITTEST::call")
-			params ["_object", "_function", "_returnexpected","_parameters", "_condition"];
-			
+			DEBUG(#, "OO_UNITTEST::executeAssertOnObject")
+			params ["_object", "_function", "_returnexpected","_parameters", "_condition"];		
 			private _return = "";
-			private _reason = "";
-			private 	_result = "SUCCESSED";
-			private _code = "";
+			private _reason = "None";
+			private 	_result = "FAILED";
 			private _stats = MEMBER("stats", nil);
 			private _ticktime = 0;
 			//if!(toLower(_condition) in ["assert_equal", "assert_not_equal", "assert_instance_of", "assert_kind_of", "assert_respond_to"]) then {_condition = "assert_equal";};
 			if!(toLower(_condition) in ["assert_equal", "assert_not_equal"]) then {_condition = "assert_equal";};
 			try { 
+				DEBUG(#, "OO_UNITTEST::executeAssertOnObject::try")
 				if(isnil "_object") then { throw "OBJECTISNOTDEFINED"; };
 				if!(typeName _object isEqualTo "CODE") then { throw "OBJECTISNOTDEFINED"; };
 				if(isnil "_function") then { throw "FUNCTIONNOTSTRING"; };
 				if!(typeName _function isEqualTo "STRING") then { throw "FUNCTIONNOTSTRING"; };
 				if(isnil "_returnexpected") then { throw "RESULTNOTDEFINED"; };
 				
-				isnil { 
-					if!(isNil "_parameters") then  {
-						_ticktime = diag_tickTime;
-						_return = [_function, _parameters] call _object;
-						_ticktime = diag_tickTime - _ticktime;
-					} else {
+				if(isnil "_parameters") then {
+					_parameters = "None";
+					isnil { 
 						_ticktime = diag_tickTime;
 						_return = _function call _object;
+						_ticktime = diag_tickTime - _ticktime;
+					};
+				} else {
+					isnil { 
+						_ticktime = diag_tickTime;
+						_return = [_function, _parameters] call _object;
 						_ticktime = diag_tickTime - _ticktime;
 					};
 				};
@@ -213,7 +164,9 @@
 				};
 				_stats = [(_stats select 0) + 1, (_stats select 1) , (_stats select 2)];
 				MEMBER("stats", _stats);
+				_result = "SUCCESSED";
 			} catch {
+				DEBUG(#, "OO_UNITTEST::executeAssertOnObject::catch")
 				switch (_exception) do { 
 					case "OBJECTISNOTDEFINED" : {
 						_reason = "Exception: object was not define";
@@ -245,6 +198,7 @@
 						_result = "FAILED";
 						_stats = [(_stats select 0), (_stats select 1), (_stats select 2)+1];
 						MEMBER("stats", _stats);
+						_return = nil;
 					};
 					case "RESULTNOTEXPECTED" : {
 						_reason = "Exception: result is not the one expected";
@@ -257,7 +211,18 @@
 					}; 
 				};
 			};
-			_array = [_function, _parameters, _condition, _returnexpected, _return, _ticktime, _result, _reason];
+			private _array = [
+				format["%1", _function],
+				format["%1", _parameters],
+				format["%1", _condition],
+				format["%1", typename _returnexpected],
+				format["%1", _returnexpected],
+				format["%1", typename _return],
+				format["%1", _return],
+				format["%1", _ticktime],
+				format["%1", _result],
+				format["%1", _reason]
+			];
 			MEMBER("pushLog", _array);
 		};
 
