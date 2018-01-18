@@ -83,7 +83,7 @@
 			MEMBER("executeAssertOnObject", _this);
 		};
 
-		PRIVATE FUNCTION("array", "executeCode") {
+/*		PRIVATE FUNCTION("array", "executeCode") {
 			private _object = _this select 0;
 			private _function = _this select 1;
 			private _parameters = _this select 2;
@@ -119,7 +119,7 @@
 			};
 			_stats = [(_stats select 0) + 1, (_stats select 1) , (_stats select 2)];
 			MEMBER("stats", _stats);
-		};
+		};*/
 
 		PRIVATE FUNCTION("array", "executeAssertOnObject") {
 			DEBUG(#, "OO_UNITTEST::executeAssertOnObject")
@@ -134,13 +134,13 @@
 			if!(toLower(_condition) in ["assert_equal", "assert_not_equal"]) then {_condition = "assert_equal";};
 			try { 
 				DEBUG(#, "OO_UNITTEST::executeAssertOnObject::try")
-				if(isnil "_object") then { throw "OBJECTISNOTDEFINED"; };
+				if(isNil "_object") then { throw "OBJECTISNOTDEFINED"; };
 				if!(typeName _object isEqualTo "CODE") then { throw "OBJECTISNOTDEFINED"; };
-				if(isnil "_function") then { throw "FUNCTIONNOTSTRING"; };
+				if(isNil "_function") then { throw "FUNCTIONNOTSTRING"; };
 				if!(typeName _function isEqualTo "STRING") then { throw "FUNCTIONNOTSTRING"; };
-				if(isnil "_returnexpected") then { throw "RESULTNOTDEFINED"; };
+				//if(isnil "_returnexpected") then { throw "RESULTNOTDEFINED"; };
 				
-				if(isnil "_parameters") then {
+				if(isNil "_parameters") then {
 					_parameters = "None";
 					isnil { 
 						_ticktime = diag_tickTime;
@@ -155,12 +155,20 @@
 					};
 				};
 
-				if(isNil "_return") then { throw "FUNCTIONRESULTISNIL"; };
+				//if(isNil "_return") then { throw "FUNCTIONRESULTISNIL"; };
+				//diag_log format ["unittest: %1", _this];
+
 				switch (_condition) do {
 					case "assert_equal": {
+						if((isNil "_return") or (isNil "_returnexpected")) then {
+							if!((isNil "_return") and (isNil "_returnexpected")) then { throw "RESULTNOTEXPECTED"; };	
+						};
 						if!(_return isEqualTo _returnexpected) then { throw "RESULTNOTEXPECTED"; };
 					};
 					case "assert_not_equal": {
+						if((isNil "_return") or (isNil "_returnexpected")) then {
+							if((isNil "_return") and (isNil "_returnexpected")) then { throw "RESULTNOTEXPECTED"; };	
+						};		
 						if(_return isEqualTo _returnexpected) then { throw "RESULTNOTEXPECTED"; };
 					};
 				};
@@ -169,10 +177,10 @@
 				_result = "SUCCESSED";
 			} catch {
 				DEBUG(#, "OO_UNITTEST::executeAssertOnObject::catch")
+				if(isNil "_parameters") then {_parameters = "None";};
 				switch (_exception) do { 
 					case "OBJECTISNOTDEFINED" : {
 						_reason = "Object is not define";
-						_object = format ["%1", _object];
 						_function = format ["%1", _function];
 						_result = "PASSED";
 						_stats = [(_stats select 0), (_stats select 1) + 1 , (_stats select 2)];

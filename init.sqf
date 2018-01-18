@@ -29,9 +29,9 @@
 	 _helloworld = "new" call OO_HELLOWORLD;
 
 	_result = ["assert_equal", [_helloworld, "helloworld", "i got it", nil]] call _unittest;
-	_result = ["assert_not_equal", [_helloworld, "helloworld", "i got it", nil]] call _unittest;
-	_result = ["assert_not_equal", [_helloworld, "hellowor", "i got it", nil]] call _unittest;
-	_result = ["assert_not_equal", [_helworld, "helloworld", "i got it", nil]] call _unittest;
+	_result = ["assert_not_equal", [_helloworld, "helloworld", "i got it", nil]] call _unittest; 
+	_result = ["assert_equal", [_helloworld, "hellowor", "i got it", nil]] call _unittest; 
+	_result = ["assert_equal", [nil, "helloworld", "i got it", nil]] call _unittest;
 
 	 "dump" call _unittest;
 
