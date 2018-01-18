@@ -89,6 +89,7 @@
 			private _parameters = _this select 2;
 			private _ticktime = 0;
 			private _return = "";
+
 			isnil { 
 				if(isnil "_parameters") then {
 					_ticktime = diag_tickTime;
@@ -123,12 +124,13 @@
 		PRIVATE FUNCTION("array", "executeAssertOnObject") {
 			DEBUG(#, "OO_UNITTEST::executeAssertOnObject")
 			params ["_object", "_function", "_returnexpected","_parameters", "_condition"];		
+			
 			private _return = "";
 			private _reason = "None";
 			private 	_result = "FAILED";
 			private _stats = MEMBER("stats", nil);
 			private _ticktime = 0;
-			//if!(toLower(_condition) in ["assert_equal", "assert_not_equal", "assert_instance_of", "assert_kind_of", "assert_respond_to"]) then {_condition = "assert_equal";};
+			
 			if!(toLower(_condition) in ["assert_equal", "assert_not_equal"]) then {_condition = "assert_equal";};
 			try { 
 				DEBUG(#, "OO_UNITTEST::executeAssertOnObject::try")
@@ -169,7 +171,7 @@
 				DEBUG(#, "OO_UNITTEST::executeAssertOnObject::catch")
 				switch (_exception) do { 
 					case "OBJECTISNOTDEFINED" : {
-						_reason = "Exception: object was not define";
+						_reason = "Object is not define";
 						_object = format ["%1", _object];
 						_function = format ["%1", _function];
 						_result = "PASSED";
@@ -178,7 +180,7 @@
 						_return = nil;
 					};
 					case "RESULTNOTDEFINED" : {
-						_reason = "Exception: result expected was not define";
+						_reason = "Expected result was not define";
 						_function = format ["%1", _function];
 						_result = "PASSED";
 						_stats = [(_stats select 0), (_stats select 1) + 1 , (_stats select 2)];
@@ -186,7 +188,7 @@
 						_return = nil;
 					};
 					case "FUNCTIONNOTSTRING" : {
-						_reason = "Exception: function name is not string";
+						_reason = "Function name is not string";
 						_function = format ["%1", _function];
 						_result = "PASSED";
 						_stats = [(_stats select 0), (_stats select 1) + 1 , (_stats select 2)];
@@ -194,14 +196,14 @@
 						_return = nil;
 					}; 
 					case "FUNCTIONRESULTISNIL" : {
-						_reason = "Exception: function result is nil";
+						_reason = "Function result is nil";
 						_result = "FAILED";
 						_stats = [(_stats select 0), (_stats select 1), (_stats select 2)+1];
 						MEMBER("stats", _stats);
 						_return = nil;
 					};
 					case "RESULTNOTEXPECTED" : {
-						_reason = "Exception: result is not the one expected";
+						_reason = "Result is not the one expected";
 						_result = "FAILED";
 						_stats = [(_stats select 0), (_stats select 1), (_stats select 2)+1];
 						MEMBER("stats", _stats);

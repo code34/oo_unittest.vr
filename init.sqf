@@ -26,26 +26,12 @@
 	sleep 2;
 
 	 _unittest = "new" call OO_UNITTEST;
-	 _hellworld = "new" call OO_HELLOWORLD;
+	 _helloworld = "new" call OO_HELLOWORLD;
 
-	 helloworld = { "hello world"; };
-
-	cheatfunction = { 
-	 	for "_i" from 0 to 9999 step 1 do {
-	 		hint "blabla";
-	 	};
-	 	"hello world";
-	};
-	 
-	_result = ["assert_equal", [helloworld, "ho world", ""]] call _unittest;
-	_result = ["assert_equal", [toto, "hello world", ""]] call _unittest;
-	_result = ["assert_equal", ["helpjdfq", "hello world", ""]] call _unittest;
-	_result = ["assert_equal", ["helloworld", "hello world", ""]] call _unittest;
-	_result = ["assert_equal", ["cheatfunction", "hello world", ""]] call _unittest;
-	_result = ["assert_equal", ["helloworld", "hello robert", ""]] call _unittest;
-	_result = ["assert_not_equal", ["helloworld", "hello jojo la frite", ""]] call _unittest;
-	_result = ["assert_equal", ["helloworld", "hello renaud et sa grosse bécane", ""]] call _unittest;
-	_result = ["assert_equal", [_helloworld, "helloworld", "i got it", ""]] call _unittest;
+	_result = ["assert_equal", [_helloworld, "helloworld", "i got it", nil]] call _unittest;
+	_result = ["assert_not_equal", [_helloworld, "helloworld", "i got it", nil]] call _unittest;
+	_result = ["assert_not_equal", [_helloworld, "hellowor", "i got it", nil]] call _unittest;
+	_result = ["assert_not_equal", [_helworld, "helloworld", "i got it", nil]] call _unittest;
 
 	 "dump" call _unittest;
 
