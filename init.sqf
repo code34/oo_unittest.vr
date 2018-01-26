@@ -28,9 +28,13 @@
 	 _unittest = "new" call OO_UNITTEST;
 	 _helloworld = "new" call OO_HELLOWORLD;
 
+	 // should succeed
 	_result = ["assert_equal", [_helloworld, "helloworld", "i got it", nil]] call _unittest;
+	//shoud failed
 	_result = ["assert_not_equal", [_helloworld, "helloworld", "i got it", nil]] call _unittest; 
+	//should failed
 	_result = ["assert_equal", [_helloworld, "hellowor", "i got it", nil]] call _unittest; 
+	//should passed
 	_result = ["assert_equal", [nil, "helloworld", "i got it", nil]] call _unittest;
 
 	 "dump" call _unittest;
