@@ -65,7 +65,7 @@
 			_log = _log + format ["Passed: %1 ", _stats select 1] + endl;
 			_log = _log + format ["Failed: %1", _stats select 2] + endl;
 			copyToClipboard _log;
-			hint "Results were copied to your clipboard";
+			hint "Results Dump was copied to your clipboard";
 			MEMBER("init", nil);
 		};
 
