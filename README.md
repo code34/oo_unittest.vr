@@ -4,13 +4,17 @@ An oop class to create unit test.
 
 OO_UNITTEST is now full oriented to work with OOP object
 
-Follow those steps:
+## How to
+	
 	1- Declare your tests assert
+	
 	2 - Dump the results in your clipboard
 
 The exemple in the init.sqf is fully operationnal.
 
-There is 2 kinds of tests assert.
+## Assert Tests
+
+There is two kind of asserts tests.
 
 assert_equal : 
 	check if the object method returns the result expected
