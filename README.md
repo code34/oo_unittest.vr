@@ -1,8 +1,8 @@
 # oo_unittest
 
-An oop class to create unit test.
+An oop class to create unit test. From wikipedia: In computer programming, unit testing is a software testing method by which individual units of source code, sets of one or more computer program modules together with associated control data, usage procedures, and operating procedures, are tested to determine whether they are fit for use.
 
-OO_UNITTEST is now full oriented to work with OOP object
+OO_UNITTEST is now full oriented to work with OOP.h objects.
 
 ## How to
 	
