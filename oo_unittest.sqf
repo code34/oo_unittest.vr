@@ -83,44 +83,6 @@
 			MEMBER("executeAssertOnObject", _this);
 		};
 
-/*		PRIVATE FUNCTION("array", "executeCode") {
-			private _object = _this select 0;
-			private _function = _this select 1;
-			private _parameters = _this select 2;
-			private _ticktime = 0;
-			private _return = "";
-
-			isnil { 
-				if(isnil "_parameters") then {
-					_ticktime = diag_tickTime;
-					_return = _function call _object;
-					_ticktime = diag_tickTime - _ticktime;
-				} else {
-					_ticktime = diag_tickTime;
-					_return = [_function, _parameters] call _object;
-					_ticktime = diag_tickTime - _ticktime;
-				};
-			};
-			if(isNil "_return") then { throw "FUNCTIONRESULTISNIL"; };
-			[_ticktime, _return];
-		};
-
-		PRIVATE FUNCTION("array", "compareResult") {
-			_condition = _this select 0;
-			_return = _this select 1;
-			_returnexpected = _this select 2;
-			switch (_condition) do {
-				case "assert_equal": {
-					if!(_return isEqualTo _returnexpected) then { throw "RESULTNOTEXPECTED"; };
-				};
-				case "assert_not_equal": {
-					if(_return isEqualTo _returnexpected) then { throw "RESULTNOTEXPECTED"; };
-				};
-			};
-			_stats = [(_stats select 0) + 1, (_stats select 1) , (_stats select 2)];
-			MEMBER("stats", _stats);
-		};*/
-
 		PRIVATE FUNCTION("array", "executeAssertOnObject") {
 			DEBUG(#, "OO_UNITTEST::executeAssertOnObject")
 			params ["_object", "_function", "_returnexpected","_parameters", "_condition"];		
