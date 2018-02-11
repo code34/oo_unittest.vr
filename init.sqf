@@ -28,13 +28,13 @@
 	 _unittest = "new" call OO_UNITTEST;
 	 _helloworld = "new" call OO_HELLOWORLD;
 
-	 // should succeed
+	 // should succeed cause return the good result
 	_result = ["assert_equal", [_helloworld, "helloworld", "i got it", nil]] call _unittest;
-	//shoud failed
+	//shoud failed cause return the result not expected
 	_result = ["assert_not_equal", [_helloworld, "helloworld", "i got it", nil]] call _unittest; 
-	//should failed
+	//should failed cause method doesn't exist
 	_result = ["assert_equal", [_helloworld, "hellowor", "i got it", nil]] call _unittest; 
-	//should passed
+	//should passed cause object nil doesn't exist (arma will print an error message)
 	_result = ["assert_equal", [nil, "helloworld", "i got it", nil]] call _unittest;
 
 	 "dump" call _unittest;
