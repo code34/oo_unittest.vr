@@ -88,6 +88,7 @@
 			params ["_object", "_function", "_returnexpected","_parameters", "_condition"];		
 			
 			private _return = "";
+			private _returntype = "";
 			private _reason = "None";
 			private 	_result = "FAILED";
 			private _stats = MEMBER("stats", nil);
@@ -100,7 +101,6 @@
 				if!(typeName _object isEqualTo "CODE") then { throw "OBJECTISNOTDEFINED"; };
 				if(isNil "_function") then { throw "FUNCTIONNOTSTRING"; };
 				if!(typeName _function isEqualTo "STRING") then { throw "FUNCTIONNOTSTRING"; };
-				//if(isnil "_returnexpected") then { throw "RESULTNOTDEFINED"; };
 				
 				if(isNil "_parameters") then {
 					_parameters = "None";
@@ -137,6 +137,7 @@
 				_stats = [(_stats select 0) + 1, (_stats select 1) , (_stats select 2)];
 				MEMBER("stats", _stats);
 				_result = "SUCCESSED";
+				_returntype = typeName _return;
 			} catch {
 				DEBUG(#, "OO_UNITTEST::executeAssertOnObject::catch")
 				if(isNil "_parameters") then {_parameters = "None";};
@@ -147,7 +148,8 @@
 						_result = "PASSED";
 						_stats = [(_stats select 0), (_stats select 1) + 1 , (_stats select 2)];
 						MEMBER("stats", _stats);
-						_return = nil;
+						_return = "nil";
+						_returntype = "nil";
 					};
 					case "RESULTNOTDEFINED" : {
 						_reason = "Expected result was not define";
@@ -155,7 +157,8 @@
 						_result = "PASSED";
 						_stats = [(_stats select 0), (_stats select 1) + 1 , (_stats select 2)];
 						MEMBER("stats", _stats);
-						_return = nil;
+						_return = "nil";
+						_returntype = "nil";
 					};
 					case "FUNCTIONNOTSTRING" : {
 						_reason = "Function name is not string";
@@ -163,20 +166,23 @@
 						_result = "PASSED";
 						_stats = [(_stats select 0), (_stats select 1) + 1 , (_stats select 2)];
 						MEMBER("stats", _stats);
-						_return = nil;
+						_return = "nil";
+						_returntype = "nil";
 					}; 
 					case "FUNCTIONRESULTISNIL" : {
 						_reason = "Function result is nil";
 						_result = "FAILED";
 						_stats = [(_stats select 0), (_stats select 1), (_stats select 2)+1];
 						MEMBER("stats", _stats);
-						_return = nil;
+						_return = "nil";
+						_returntype = "nil";
 					};
 					case "RESULTNOTEXPECTED" : {
 						_reason = "Result is not the one expected";
 						_result = "FAILED";
 						_stats = [(_stats select 0), (_stats select 1), (_stats select 2)+1];
 						MEMBER("stats", _stats);
+						_returntype = typeName _return;
 					};
 					default {
 						_reason = "Exception: not handle";
@@ -189,7 +195,7 @@
 				format["%1", _condition],
 				format["%1", typename _returnexpected],
 				format["%1", _returnexpected],
-				format["%1", typename _return],
+				format["%1", _returntype],
 				format["%1", _return],
 				format["%1", _ticktime],
 				format["%1", _result],
